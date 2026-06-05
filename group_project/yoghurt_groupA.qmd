@@ -1,0 +1,68 @@
+---
+title: "Group A — Data Dossier"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+---
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+df <- read_csv(here("data", "WORKSHOP-2026
+data/group_a_yogurt/00_sample_ids_yogurt.csv"))
+```
+
+```{r}
+df <- read_csv(here("data", "WORKSHOP-2026
+group_a_yogurt/01_participant_metadata_yogurt.csv"))
+```
+
+```{r}
+df <- read_csv(here("data", "WORKSHOP-2026
+group_a_yogurt/02_qpcr_results_yogurt.csv"))
+```
+
+```{r}
+df <- read_csv(here("data", "WORKSHOP-2026
+group_a_yogurt/03_luminex_results_yogurt.csv"))
+```
+
+```{r}
+sample_ids <- read_csv("data/group_a_yogurt/00_sample_ids_yogurt.csv")
+glimpse(sample_ids)
+```
+
+```{r}
+participant_metadata <- read_csv("data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+glimpse(participant_metadata)
+```
+
+```{r}
+qpcr_results <- read_csv("data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+glimpse(qpcr_results)
+```
+
+```{r}
+luminex_results <- read_csv("data/group_a_yogurt/03_luminex_results_yogurt.csv")
+glimpse(luminex_results)
+```
+
+```{r}
+final-presentation.html
+```
+
+
+---
+
+## 2️⃣ Render to HTML
+
+In your terminal:
+
+```{r}
+quarto render final-presentation.qmd
+```

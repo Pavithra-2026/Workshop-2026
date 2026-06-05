@@ -1,0 +1,141 @@
+---
+title: "Group A — Yogurt Study: Dataset Exploration"
+author: "Workshop Participant"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+This document explores all four CSV files in the `data/group_a_yogurt/` folder.
+The study looks at how eating yogurt affects the vaginal microbiome. Participants
+were assigned to either a **yogurt** group or an **unchanged diet** group, and
+samples were taken at **baseline** and **after antibiotic** treatment.
+
+```{r setup, include=FALSE}
+library(tidyverse)
+```
+
+---
+
+## `00_sample_ids_yogurt.csv`
+
+**What a row represents:** one biological sample collected from one participant
+at one time point.
+
+**Columns:**
+
+| Column | Meaning |
+|--------|---------|
+| `pid` | Participant ID (e.g. `pid_25`). Links to `01_participant_metadata_yogurt.csv` |
+| `time_point` | When the sample was taken: `baseline` or `after_antibiotic` |
+| `arm` | Study group assignment: `yogurt` or `unchanged_diet` |
+| `sample_id` | Unique sample identifier (e.g. `UNCH001`). Links to `02_qpcr_results_yogurt.csv` and `03_luminex_results_yogurt.csv` |
+
+```{r a00}
+sample_ids <- read_csv("../../data/group_a_yogurt/00_sample_ids_yogurt.csv")
+glimpse(sample_ids)
+```
+
+---
+
+## `01_participant_metadata_yogurt.csv`
+
+**What a row represents:** one study participant.
+
+**Columns:**
+
+| Column | Meaning |
+|--------|---------|
+| `pid` | Participant ID. Links to `00_sample_ids_yogurt.csv` |
+| `arm` | Study group: `yogurt` or `unchanged_diet` |
+| `days_since_last_sex` | Number of days since the participant last had sex |
+| `birth_control` | Type of birth control used: `no hormonal birth control` or `Depoprovera` |
+| `age` | Age in years |
+| `education` | Education level: `less than grade 9`, `grade 10-12, matriculated`, `grade 10-12, not matriculated`, or `post-secondary` |
+| `sex` | Biological sex (all `female`) |
+
+```{r a01}
+participants <- read_csv("../../data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+glimpse(participants)
+```
+
+---
+
+## `02_qpcr_results_yogurt.csv`
+
+**What a row represents:** one sample's bacterial DNA measurements from qPCR
+(quantitative polymerase chain reaction — a lab technique that counts how many
+bacterial DNA copies are present).
+
+**Columns:**
+
+| Column | Meaning |
+|--------|---------|
+| `sample_id` | Unique sample identifier. Links to `00_sample_ids_yogurt.csv` |
+| `qpcr_bacteria` | Total bacterial load (number of DNA copies detected across all bacteria) |
+| `qpcr_crispatus` | DNA copies of *Lactobacillus crispatus* — a "good" bacterium that keeps the vagina healthy |
+| `qpcr_iners` | DNA copies of *Lactobacillus iners* — another *Lactobacillus* species, often associated with a less stable microbiome |
+
+```{r a02}
+qpcr <- read_csv("../../data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+glimpse(qpcr)
+```
+
+---
+
+## `03_luminex_results_yogurt.csv`
+
+**What a row represents:** one cytokine measurement for one sample. Each sample
+has multiple rows (one per cytokine tested). Cytokines are signalling proteins
+the immune system uses to communicate — they tell us about inflammation levels.
+
+**Columns:**
+
+| Column | Meaning |
+|--------|---------|
+| `sample_id` | Unique sample identifier. Links to `00_sample_ids_yogurt.csv` |
+| `cytokine` | Name of the cytokine measured: `IL-1a`, `IL-1b`, `IL-6`, `IL-8`, `IL-10`, `TNFa`, `IFN-Y`, `IP-10`, `MIG`, `MIP-3a` |
+| `conc` | Concentration of the cytokine (in pg/mL — picograms per millilitre) |
+| `limits` | Whether the value was `within limits` (reliable) or `out of range` (too low/high to measure accurately) |
+
+```{r a03}
+luminex <- read_csv("../../data/group_a_yogurt/03_luminex_results_yogurt.csv")
+glimpse(luminex)
+```
+
+---
+
+## Bringing it together
+
+These four tables are linked by common ID columns:
+
+```{r a04}
+# How many participants in each group?
+participants |>
+  count(arm)
+
+# How many samples per time point?
+sample_ids |>
+  count(time_point, arm)
+
+# Are all samples matched with qPCR results?
+sample_ids |>
+  anti_join(qpcr, by = "sample_id")
+
+# Join sample info to qPCR data for analysis
+qpcr_joined <- sample_ids |>
+  left_join(qpcr, by = "sample_id")
+
+glimpse(qpcr_joined)
+
+# Join sample info to Luminex data
+luminex_joined <- sample_ids |>
+  left_join(luminex, by = "sample_id")
+
+glimpse(luminex_joined)
+```

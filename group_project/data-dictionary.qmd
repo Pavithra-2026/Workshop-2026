@@ -1,0 +1,196 @@
+---
+title: "Group A — Yogurt Study Data Dictionary"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+knitr::opts_knit$set(root.dir = "..")
+```
+
+## Overview
+
+This dataset comes from a study of women's vaginal microbiome. Participants
+were split into two **arms**: a **yogurt** group (who ate yogurt daily) and an
+**unchanged_diet** group (who didn't change their diet). Samples were collected
+at two time points: **baseline** (before the study intervention) and
+**after_antibiotic** (after a course of antibiotics).
+
+There are four CSV files in `data/group_a_yogurt/`. The rest of this document
+describes each one: what a single row represents and what every column means.
+
+---
+
+## 00\_sample\_ids\_yogurt.csv
+
+**A single row represents** one biological sample collected from one participant
+at one time point.
+
+```{r}
+sample_ids <- read_csv("data/group_a_yogurt/00_sample_ids_yogurt.csv")
+glimpse(sample_ids)
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | **Participant ID** — a unique code for each person in the study (e.g. `pid_25`). The same person appears twice if they provided a sample at both time points. |
+| `time_point` | character | When the sample was taken: `baseline` (before antibiotics / yogurt) or `after_antibiotic` (after the antibiotic course). |
+| `arm` | character | Which study group the participant was assigned to: `yogurt` (ate yogurt daily) or `unchanged_diet` (no dietary change). |
+| `sample_id` | character | **Unique sample identifier** — a code that links to the lab results in the other CSV files. Starts with `YOG` for yogurt-arm samples and `UNCH` for unchanged-diet samples. |
+
+**Quick summary:**
+
+```{r}
+sample_ids |> count(arm, time_point)
+```
+
+---
+
+## 01\_participant\_metadata\_yogurt.csv
+
+**A single row represents** one participant in the study. There are 51
+participants total.
+
+```{r}
+metadata <- read_csv("data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+glimpse(metadata)
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID — matches the `pid` in the sample IDs table. |
+| `arm` | character | Assigned study group: `yogurt` or `unchanged_diet`. |
+| `days_since_last_sex` | double | Number of days between the participant's last sexual activity and data collection. |
+| `birth_control` | character | Type of hormonal birth control used: `Depoprovera` (an injectable contraceptive) or `no hormonal birth control`. |
+| `age` | double | Participant's age in years. |
+| `education` | character | Highest education level attained: `less than grade 9`, `grade 10-12, not matriculated`, `grade 10-12, matriculated`, or `post-secondary`. ("Matriculated" means they passed the final high-school exams.) |
+| `sex` | character | All participants are `female`. |
+
+**Quick summary:**
+
+```{r}
+metadata |>
+  summarise(
+    n_participants = n(),
+    mean_age = mean(age),
+    min_age = min(age),
+    max_age = max(age),
+    .groups = "drop"
+  )
+
+metadata |> count(arm)
+metadata |> count(education)
+metadata |> count(birth_control)
+```
+
+---
+
+## 02\_qpcr\_results\_yogurt.csv
+
+**A single row represents** the qPCR (quantitative polymerase chain reaction)
+results for one biological sample. qPCR is a lab technique that measures how
+much of a specific bacterium's DNA is present.
+
+```{r}
+qpcr <- read_csv("data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+glimpse(qpcr)
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `sample_id` | character | Unique sample identifier — links to the sample IDs table. |
+| `qpcr_bacteria` | double | **Total bacterial load** — the amount of all bacteria DNA measured in the sample (gene copies per mL). |
+| `qpcr_crispatus` | double | Amount of *Lactobacillus crispatus* DNA (gene copies per mL). *L. crispatus* is a "good" bacterium linked to healthy vaginal microbiomes. |
+| `qpcr_iners` | double | Amount of *Lactobacillus iners* DNA (gene copies per mL). *L. iners* is another common vaginal *Lactobacillus* species, but less protective than *L. crispatus*. |
+
+**Quick look at the numbers:**
+
+```{r}
+qpcr |>
+  summarise(
+    across(where(is.numeric), list(mean = mean, sd = sd, min = min, max = max))
+  ) |>
+  pivot_longer(everything(), names_to = "measure", values_to = "value") |>
+  separate(measure, into = c("bacteria", "stat"), sep = "_")
+
+# How many samples have detectable crispatus?
+qpcr |> count(qpcr_crispatus == 0)
+```
+
+---
+
+## 03\_luminex\_results\_yogurt.csv
+
+**A single row represents** the concentration of one **cytokine** measured in
+one biological sample. Cytokines are signalling proteins the immune system
+releases. The data is in **long format** — each sample has 10 rows (one per
+cytokine).
+
+```{r}
+luminex <- read_csv("data/group_a_yogurt/03_luminex_results_yogurt.csv")
+glimpse(luminex)
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `sample_id` | character | Unique sample identifier — links to the sample IDs table. |
+| `cytokine` | character | Which immune signalling protein was measured. The 10 cytokines are: `IL-1a`, `IL-1b`, `IL-6`, `IL-8`, `IL-10`, `TNFa`, `IFN-Y`, `IP-10`, `MIG`, `MIP-3a`. |
+| `conc` | double | Measured concentration of the cytokine (in pg/mL). |
+| `limits` | character | Whether the measured concentration was within the reliable range of the assay: `within limits` or `out of range`. "Out of range" means the value was too low or too high for the test to measure precisely. |
+
+**Cytokines measured:**
+
+```{r}
+luminex |> distinct(cytokine)
+
+# How many measurements are within vs out of range?
+luminex |> count(limits)
+
+# Average concentration per cytokine
+luminex |>
+  filter(limits == "within limits") |>
+  group_by(cytokine) |>
+  summarise(
+    mean_conc = mean(conc),
+    sd_conc = sd(conc),
+    n = n(),
+    .groups = "drop"
+  ) |>
+  arrange(desc(mean_conc))
+```
+
+---
+
+## Relationships between the files
+
+You can join these tables together using the key columns:
+
+```{r}
+# Link sample info to qPCR results
+sample_ids |>
+  left_join(qpcr, by = "sample_id") |>
+  glimpse()
+
+# Link sample info to luminex results
+sample_ids |>
+  left_join(luminex, by = "sample_id") |>
+  glimpse()
+
+# Link participant metadata through sample_ids
+sample_ids |>
+  left_join(metadata, by = "pid") |>
+  glimpse()
+```
+
+---
+
+## Session info
+
+```{r}
+sessionInfo()
+```

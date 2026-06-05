@@ -1,0 +1,206 @@
+---
+title: "Group A — Yogurt Study: Final Presentation"
+author: "Workshop Participant"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(gtsummary)
+library(ggpubr)
+
+sample_ids   <- read_csv("../../data/group_a_yogurt/00_sample_ids_yogurt.csv")
+participants <- read_csv("../../data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+qpcr         <- read_csv("../../data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+luminex      <- read_csv("../../data/group_a_yogurt/03_luminex_results_yogurt.csv")
+
+qpcr_joined    <- sample_ids |> left_join(qpcr, by = "sample_id")
+luminex_joined <- sample_ids |> left_join(luminex, by = "sample_id")
+```
+
+---
+
+## 1. What biological question did you investigate?
+
+> **Does eating yogurt help *Lactobacillus crispatus* — the protective
+> vaginal bacterium — recover after antibiotic treatment?**
+>
+> Antibiotics disrupt the vaginal microbiome by killing bacteria
+> indiscriminately. We wanted to know if eating yogurt (which contains
+> bacteria) helps *L. crispatus* bounce back faster compared to an
+> unchanged diet.
+
+---
+
+## 2. Who are the participants?
+
+```{r table-one}
+participants |>
+  select(-pid, -sex) |>
+  tbl_summary(
+    by = arm,
+    statistic = list(age ~ "{mean} ({sd})")
+  ) |>
+  add_p() |>
+  add_overall() |>
+  bold_labels() |>
+  modify_header(label = "**Characteristic**")
+```
+
+**Key takeaways:**
+
+- **51 participants** (25 unchanged diet, 26 yogurt) — roughly balanced
+- **Age similar** across groups (mean ≈ 31 in both, p = 0.55)
+- But **birth control is imbalanced**: 17 of 26 yogurt participants use
+  Depoprovera vs. only 8 of 25 in the unchanged diet group. This could
+  matter for the microbiome.
+
+---
+
+## 3. What did you compare, and what did you find?
+
+### Main finding: *L. crispatus* recovery after antibiotics
+
+In the **yogurt group**, 85% of samples had detectable *L. crispatus* after
+antibiotics. In the **unchanged diet group**, only 48% did.
+
+```{r crispatus-recovery}
+# Prepare paired data for L. crispatus
+qpcr_joined |>
+  filter(time_point %in% c("baseline", "after_antibiotic")) |>
+  mutate(time_point = fct_relevel(time_point, "baseline", "after_antibiotic")) |>
+  ggplot(aes(time_point, qpcr_crispatus)) +
+  geom_line(aes(group = pid), alpha = 0.3) +
+  geom_point(aes(color = arm), size = 2.5, alpha = 0.7) +
+  facet_wrap(~ arm) +
+  scale_y_log10(labels = scales::comma) +
+  labs(
+    title = "L. crispatus: baseline → after antibiotic (each line = one person)",
+    subtitle = "Yogurt group shows more recovery after antibiotics",
+    y = "L. crispatus DNA copies (log scale)",
+    x = "",
+    color = "Group"
+  ) +
+  stat_compare_means(
+    method = "wilcox.test",
+    paired = TRUE,
+    comparisons = list(c("baseline", "after_antibiotic"))
+  ) +
+  theme_minimal()
+```
+
+**What this shows:** Each line is one participant. At baseline, almost
+everyone has near-zero *L. crispatus* in both groups. After antibiotics,
+the yogurt group has many participants with visible *L. crispatus* levels,
+while the unchanged diet group mostly stays flat at zero.
+
+### Secondary finding: Total bacterial load
+
+```{r total-bacteria}
+paired_bacteria <- qpcr_joined |>
+  select(pid, arm, time_point, qpcr_bacteria) |>
+  pivot_wider(names_from = time_point, values_from = qpcr_bacteria)
+
+paired_bacteria |>
+  ggplot(aes(x = "Baseline", y = baseline)) +
+  geom_point(aes(color = arm), size = 2.5, alpha = 0.7) +
+  geom_segment(aes(x = "Baseline", xend = "After antibiotic",
+                   y = baseline, yend = after_antibiotic,
+                   color = arm, group = pid),
+               alpha = 0.4) +
+  geom_point(aes(x = "After antibiotic", y = after_antibiotic, color = arm),
+             size = 2.5, alpha = 0.7) +
+  scale_y_log10(labels = scales::comma) +
+  facet_wrap(~ arm) +
+  labs(
+    title = "Total bacterial load: each participant's change",
+    subtitle = "Yogurt group tends to decrease; unchanged diet is mixed",
+    y = "Total bacterial DNA copies (log scale)",
+    x = "",
+    color = "Group"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+**What this shows:** Most participants in the yogurt group show a
+*decrease* in total bacterial load from baseline to after antibiotics.
+The unchanged diet group is more mixed — about half go up, half go down.
+
+---
+
+## 4. Limitations
+
+> **What could go wrong with our conclusion?**
+>
+> 1. **Birth control imbalance** — 65% of the yogurt group uses Depoprovera
+>    vs. 32% of the unchanged diet group. Depoprovera affects hormones and
+>    could independently influence the vaginal microbiome. The *L. crispatus*
+>    "recovery" might partly reflect this difference, not the yogurt.
+>
+> 2. **No placebo** — participants knew which group they were in. We can't
+>    rule out placebo effects or behavioural changes.
+>
+> 3. ***L. crispatus* mostly absent at baseline** — with 96% of samples
+>    showing zero at baseline, we're comparing recovery from near-zero,
+>    which is hard to measure precisely.
+>
+> 4. **Small sample** — 51 participants is modest. One or two extreme
+>    values can influence the results.
+>
+> 5. **Out-of-range cytokine measurements** — several cytokines (IL-10,
+>    IFN-Y, TNFa) were almost entirely below detection limits, so we
+>    couldn't assess immune response for those.
+
+---
+
+## 5. If you had another week, what would you do next?
+
+> 1. **Adjust for Depoprovera** — run a model that controls for birth
+>    control type to see if the yogurt effect holds up
+> 2. **Look at *L. iners*** — does yogurt push the microbiome toward
+>    *L. crispatus* dominance and away from *L. iners*?
+> 3. **Check the usable cytokines** (IL-1a, IL-8, IP-10, MIG, MIP-3a)
+>    — is there a difference in inflammation between groups?
+> 4. **Identify the 9 extreme total bacteria samples** — are they from
+>    the same participants? Do they cluster in one group?
+> 5. **Build a simple model** predicting *L. crispatus* recovery from
+>    group + age + birth control
+
+---
+
+## 6. What did your group learn this week?
+
+> - **Data mapping first**: Understanding what one row means in each table
+>   and how tables connect saved us from making mistakes later
+> - **Log scales are not optional**: When data spans 4+ orders of magnitude
+>   (like bacterial DNA counts), raw-scale plots hide everything
+> - **Zeros can be meaningful**: 65% of samples had zero *L. crispatus* —
+>   that's not missing data, that's biology
+> - **"Out of range" ≠ unusable**: Many cytokine measurements were below
+>   detection limits, which tells us the assay may not be sensitive enough
+>   for vaginal samples
+> - **Making one plot three times** taught us more than making three
+>   different plots once — each iteration revealed something new
+
+---
+
+## Bonus: Shortlist of biological questions for Thursday
+
+1. **Does yogurt restore *L. crispatus* after antibiotics, controlling
+   for Depoprovera?** (Our main finding, but needs adjustment)
+2. **Does the yogurt group have a different *L. crispatus* / *L. iners*
+   ratio after antibiotics?** (A more stable microbiome has more *L. crispatus*)
+3. **Is total bacterial load reduction after antibiotics beneficial or
+   harmful?** (More bacteria isn't always better)
+4. **Do baseline characteristics (age, birth control, days since last sex)
+   predict microbiome recovery regardless of group?**
+5. **Are the extreme total bacteria values real biological variation or
+   sample contamination?** (Samples >29 million copies need investigation)

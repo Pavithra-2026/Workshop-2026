@@ -1,0 +1,234 @@
+---
+title: "Group A — Yogurt Study: Table 1 and Group Comparisons"
+author: "Workshop Participant"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+In this session we'll pick a biological question, build a **Table 1** to
+describe the participants (yogurt vs. unchanged diet), then compare groups
+using **gtsummary** and **ggpubr** with p-values.
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(gtsummary)
+library(ggpubr)
+
+# Load all four datasets
+sample_ids  <- read_csv("../../data/group_a_yogurt/00_sample_ids_yogurt.csv")
+participants <- read_csv("../../data/group_a_yogurt/01_participant_metadata_yogurt.csv")
+qpcr        <- read_csv("../../data/group_a_yogurt/02_qpcr_results_yogurt.csv")
+luminex     <- read_csv("../../data/group_a_yogurt/03_luminex_results_yogurt.csv")
+
+# Join sample info to qPCR and Luminex
+qpcr_joined <- sample_ids |>
+  left_join(qpcr, by = "sample_id")
+
+luminex_joined <- sample_ids |>
+  left_join(luminex, by = "sample_id")
+```
+
+---
+
+## Step 1 — What biological question interests your group?
+
+Write your group's question here:
+
+> *Your question:* ___________________________________________________________________
+
+---
+
+## Step 2 — Build a Table 1
+
+A Table 1 summarises the demographic and baseline characteristics of
+participants, split by study group. This lets us check if the groups are
+similar at the start of the study.
+
+```{r step2}
+# tbl_summary with defaults
+participants |>
+  select(-pid, -sex) |>  # remove ID and constant columns
+  tbl_summary(by = arm)
+```
+
+```{r step2b}
+# Add p-values to see if groups already differ at baseline
+participants |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm) |>
+  add_p()
+```
+
+```{r step2c}
+# Polished version with overall column and bold labels
+participants |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm) |>
+  add_p() |>
+  add_overall() |>
+  bold_labels() |>
+  modify_header(label = "**Characteristic**")
+```
+
+```{r step2d}
+# Override: show age as mean (SD) with a t-test
+participants |>
+  select(-pid, -sex) |>
+  tbl_summary(
+    by = arm,
+    statistic = list(age ~ "{mean} ({sd})")
+  ) |>
+  add_p(test = list(age ~ "t.test")) |>
+  add_overall() |>
+  bold_labels() |>
+  modify_header(label = "**Characteristic**")
+```
+
+**Interpretation:** Are the two groups similar at baseline? Any variables where
+p < 0.05? What does that mean for our study?
+
+---
+
+## Step 3 — Compare outcomes between groups
+
+Now let's look at the actual study outcomes. We'll compare the yogurt group
+vs. the unchanged diet group using different bacterial and cytokine measures.
+
+### 3a — Total bacterial load (qPCR)
+
+```{r step3a}
+# Boxplot of total bacterial load at each time point
+qpcr_joined |>
+  ggplot(aes(arm, qpcr_bacteria, fill = arm)) +
+  geom_boxplot() +
+  facet_wrap(~ time_point) +
+  labs(
+    title = "Total bacterial load by group",
+    subtitle = "Faceted by time point (baseline vs. after antibiotic)",
+    y = "Total bacterial DNA copies",
+    x = ""
+  ) +
+  stat_compare_means(method = "wilcox.test") +
+  theme(legend.position = "none")
+```
+
+### 3b — *L. crispatus* (protective bacterium)
+
+```{r step3b}
+qpcr_joined |>
+  ggplot(aes(arm, qpcr_crispatus, fill = arm)) +
+  geom_boxplot() +
+  facet_wrap(~ time_point) +
+  scale_y_log10() +  # log scale because data spans many orders of magnitude
+  labs(
+    title = "Lactobacillus crispatus by group",
+    subtitle = "Y-axis on log scale",
+    y = "L. crispatus DNA copies (log scale)",
+    x = ""
+  ) +
+  stat_compare_means(method = "wilcox.test") +
+  theme(legend.position = "none")
+```
+
+### 3c — *L. iners* (less stable species)
+
+```{r step3c}
+qpcr_joined |>
+  ggplot(aes(arm, qpcr_iners, fill = arm)) +
+  geom_boxplot() +
+  facet_wrap(~ time_point) +
+  scale_y_log10() +
+  labs(
+    title = "Lactobacillus iners by group",
+    y = "L. iners DNA copies (log scale)",
+    x = ""
+  ) +
+  stat_compare_means(method = "wilcox.test") +
+  theme(legend.position = "none")
+```
+
+### 3d — Cytokine levels (pick a few)
+
+```{r step3d}
+# Panel of key cytokines, only within-limits measurements
+cytokines_of_interest <- c("IL-1a", "IL-1b", "IL-6", "IL-8", "IL-10", "TNFa")
+
+luminex_joined |>
+  filter(cytokine %in% cytokines_of_interest, limits == "within limits") |>
+  ggplot(aes(arm, conc, fill = arm)) +
+  geom_boxplot() +
+  facet_wrap(~ cytokine, scales = "free_y") +
+  labs(
+    title = "Cytokine concentrations by group",
+    subtitle = "Only within-limits measurements shown",
+    y = "Concentration (pg/mL)",
+    x = ""
+  ) +
+  stat_compare_means(method = "wilcox.test") +
+  theme(legend.position = "none")
+```
+
+---
+
+## Step 4 — Paired analysis: baseline vs. after antibiotic
+
+Each participant was sampled at two time points, so we can also look at how
+things *change within* each group.
+
+```{r step4}
+# Prepare the data for paired analysis
+qpcr_paired <- qpcr_joined |>
+  filter(time_point %in% c("baseline", "after_antibiotic")) |>
+  mutate(time_point = fct_relevel(time_point, "baseline", "after_antibiotic"))
+
+# Line plot: total bacteria, pre vs. post, by group
+qpcr_paired |>
+  ggplot(aes(time_point, qpcr_bacteria)) +
+  geom_line(aes(group = pid), alpha = 0.3) +
+  geom_point(aes(color = arm), size = 2) +
+  facet_wrap(~ arm) +
+  labs(
+    title = "Change in total bacterial load: baseline → after antibiotic",
+    y = "Total bacterial DNA copies",
+    x = ""
+  ) +
+  stat_compare_means(
+    method = "wilcox.test",
+    paired = TRUE,
+    comparisons = list(c("baseline", "after_antibiotic"))
+  )
+```
+
+---
+
+## Step 5 (Optional) — Adjusted analysis
+
+We can also run a simple linear model that adjusts for baseline differences.
+
+```{r step5, eval=FALSE}
+# Only run this if you want to adjust for age or other variables
+outcome <- qpcr_joined |>
+  filter(time_point == "after_antibiotic") |>
+  left_join(participants, by = c("pid", "arm"))
+
+lm(log10(qpcr_bacteria) ~ arm + age, data = outcome) |>
+  tbl_regression()
+```
+
+---
+
+## What does your group conclude?
+
+Write your takeaways here:
+
+> *Our findings:*
+> _______________________________________________________________________
+> _______________________________________________________________________
+> _______________________________________________________________________

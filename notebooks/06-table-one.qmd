@@ -30,24 +30,24 @@ For each non-pid column of `table_01` (`arm`, `smoker`, `age`, `education`, `sex
 
 **1. `arm`**
 
-- How will `tbl_summary(by = arm)` summarise it? *Your answer:*
-- What test will `add_p()` pick? *Your answer:*
+- How will `tbl_summary(by = arm)` summarise it? *Your answer:* It would summerise it accourding to the number of participants in each arm, and the percentage of the total participants that represents.
+- What test will `add_p()` pick? *Your answer:* It would pick the chi-squared test, because it is a categorical variable.
 
 **2. `smoker`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* It would summerise it accourding to the number of smoker and non-smoker participants, and the percentage of the total participants that represents. I t would also pick the chi-sqaure test since it is catergorical variable.
 
 **3. `age`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* It would summarise it by giving the mean and standard deviation of age for each arm. It would pick the t-test since it is a continuous variable.
 
 **4. `education`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* It would summarise it accourding to the number of participants in each education level, and the percentage of the total participants that represents. It would also pick the chi-sqaure test since it is catergorical variable.
 
 **5. `sex`**
 
-- *Your answer (summary, test):*
+- *Your answer (summary, test):* It would summarise it accourding to the number of participants in each sex, the percentage of the total participants that represents. It would also pick the chi-sqaure test since it is catergorical variable.
 
 ## Part 2 — Build
 
@@ -63,17 +63,36 @@ table_01 |>
 ```{r}
 # step 2: add p-values
 # (modify the previous chunk by adding `|> add_p()`)
+table_01 |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm) |>
+  add_p()
 ```
 
 ```{r}
 # step 3: override age to mean (SD) + t-test
 # statistic = list(age ~ "{mean} ({sd})")
 # test = list(age ~ "t.test")
+table_01 |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm) |>
+  add_p()
+  statistical = list (age ~ "{mean} ({sd})")
+  test = list(age ~ "t.test")
 ```
 
 ```{r}
 # step 4: polish
 # add `|> add_overall() |> bold_labels() |> modify_header(label ~ "**Characteristic**")`
+table_01 |>
+  select(-pid, -sex) |>
+  tbl_summary(by = arm) |>
+  add_p()
+  statistical = list (age ~ "{mean} ({sd})")
+  test = list(age ~ "t.test")
+  add_overall() |>
+  bold_labels() |>
+  modify_header(label ~ "**Characteristic**")
 ```
 
 ## Part 3 — Reach (optional)

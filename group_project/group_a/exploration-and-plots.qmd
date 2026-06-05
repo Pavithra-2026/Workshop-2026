@@ -1,0 +1,300 @@
+---
+title: "Group A — Explore & Plot: Deep Dive into the Numbers"
+author: "Workshop Participant"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+In this session we go deep on the raw numbers — distributions, skew, suspicious
+values — then build plots and **re-make one plot three times** to learn what
+each tweak reveals.
+
+```{r setup}
+library(tidyverse)
+library(moments)
+
+sample_ids   <- read_csv("../../data/group_a_yogurt/00_sample_ids_yogurt.csv", show_col_types = FALSE)
+participants <- read_csv("../../data/group_a_yogurt/01_participant_metadata_yogurt.csv", show_col_types = FALSE)
+qpcr         <- read_csv("../../data/group_a_yogurt/02_qpcr_results_yogurt.csv", show_col_types = FALSE)
+luminex      <- read_csv("../../data/group_a_yogurt/03_luminex_results_yogurt.csv", show_col_types = FALSE)
+
+qjoined <- sample_ids |> left_join(qpcr, by = "sample_id")
+ljoined <- sample_ids |> left_join(luminex, by = "sample_id")
+```
+
+---
+
+## 1. Distributions — participant metadata
+
+### Age
+
+Age is roughly symmetric, centred around 31, range 24–37.
+
+```{r age-dist}
+summary(participants$age)
+cat("SD:", sd(participants$age), "| Skewness:", skewness(participants$age))
+
+hist(participants$age, breaks = 10, col = "steelblue",
+     main = "Age distribution", xlab = "Age (years)", ylab = "Count")
+```
+
+### Days since last sex
+
+This one is **right-skewed** (skewness = `r round(skewness(participants$days_since_last_sex), 2)`).
+Most values are 1–10 days, but a few go up to 48. Worth asking: are these
+extreme values real, or data entry errors?
+
+```{r days-dist}
+summary(participants$days_since_last_sex)
+cat("SD:", sd(participants$days_since_last_sex), "| IQR:", IQR(participants$days_since_last_sex))
+cat("Values > 14 days:", sum(participants$days_since_last_sex > 14))
+cat(" | > 30 days:", sum(participants$days_since_last_sex > 30))
+
+hist(participants$days_since_last_sex, breaks = 15, col = "coral",
+     main = "Days since last sex", xlab = "Days", ylab = "Count")
+```
+
+---
+
+## 2. Distributions — qPCR (bacterial DNA)
+
+All three qPCR variables are **heavily right-skewed** — a few samples have
+very high values while most are low.
+
+### Total bacterial load
+
+```{r bacteria-dist}
+summary(qpcr$qpcr_bacteria)
+cat("SD:", sd(qpcr$qpcr_bacteria), "| Skewness:", round(skewness(qpcr$qpcr_bacteria), 2))
+
+par(mfrow = c(1, 2))
+hist(qpcr$qpcr_bacteria, breaks = 30, col = "darkgreen",
+     main = "Total bacteria", xlab = "DNA copies")
+hist(log10(qpcr$qpcr_bacteria + 1), breaks = 30, col = "darkgreen",
+     main = "Total bacteria (log10)", xlab = "log10(DNA copies + 1)")
+```
+
+The log10 transform reveals a bimodal distribution — two peaks. That's
+interesting and worth looking into by group.
+
+### *L. crispatus*
+
+```{r crispatus-dist}
+summary(qpcr$qpcr_crispatus)
+cat("Skewness:", round(skewness(qpcr$qpcr_crispatus), 2))
+cat("Zeros:", sum(qpcr$qpcr_crispatus == 0), "/", nrow(qpcr),
+    "=", round(mean(qpcr$qpcr_crispatus == 0) * 100, 1), "%")
+
+par(mfrow = c(1, 2))
+hist(qpcr$qpcr_crispatus, breaks = 30, col = "purple",
+     main = "L. crispatus", xlab = "DNA copies")
+hist(log10(qpcr$qpcr_crispatus + 1), breaks = 30, col = "purple",
+     main = "L. crispatus (log10)", xlab = "log10(DNA copies + 1)")
+```
+
+64.7% of samples have zero *L. crispatus*. The log-scale plot shows data
+clusters at zero (left bar) and then a long tail of non-zero values.
+
+### *L. iners*
+
+```{r iners-dist}
+summary(qpcr$qpcr_iners)
+cat("SD:", sd(qpcr$qpcr_iners), "| Skewness:", round(skewness(qpcr$qpcr_iners), 2))
+cat("Zeros:", sum(qpcr$qpcr_iners == 0), "/", nrow(qpcr))
+
+par(mfrow = c(1, 2))
+hist(qpcr$qpcr_iners, breaks = 30, col = "orange",
+     main = "L. iners", xlab = "DNA copies")
+hist(log10(qpcr$qpcr_iners + 1), breaks = 30, col = "orange",
+     main = "L. iners (log10)", xlab = "log10(DNA copies + 1)")
+```
+
+Only 8 out of 102 samples have zero *L. iners* — almost everyone has some.
+The distribution is still heavily skewed.
+
+---
+
+## 3. Suspicious values
+
+### Extreme outliers in qPCR
+
+Using the "3 × IQR beyond Q3" rule:
+
+```{r outliers}
+check <- function(x, nm) {
+  q3 <- quantile(x, 0.75); q1 <- quantile(x, 0.25)
+  thr <- q3 + 3 * (q3 - q1)
+  extreme <- x[x > thr]
+  cat(nm, "- threshold:", round(thr, 1), "| count:", length(extreme), "\n")
+  if (length(extreme) > 0) {
+    print(sort(extreme, decreasing = TRUE))
+  }
+}
+check(qpcr$qpcr_bacteria, "Total bacteria")
+check(qpcr$qpcr_crispatus, "L. crispatus")
+check(qpcr$qpcr_iners, "L. iners")
+```
+
+Total bacteria has 9 extreme values — are these from one group or time point?
+Let's check:
+
+```{r outlier-details}
+qjoined |>
+  filter(qpcr_bacteria > quantile(qpcr$qpcr_bacteria, 0.75) +
+         3 * IQR(qpcr$qpcr_bacteria)) |>
+  select(sample_id, arm, time_point, qpcr_bacteria)
+```
+
+### Luminex: out-of-range measurements
+
+```{r luminex-oors}
+# Which cytokines are most affected?
+luminex |>
+  count(cytokine, limits) |>
+  group_by(cytokine) |>
+  mutate(pct = round(n / sum(n) * 100, 1)) |>
+  filter(limits == "out of range") |>
+  arrange(desc(pct))
+```
+
+**Key finding:** IL-10 (100%), IFN-Y (99%), and TNFa (98%) are virtually
+unmeasurable — almost all values are "out of range". These cytokines might
+be below the detection limit of the assay in vaginal samples.
+
+Most out-of-range measurements are at a **single value** (below detection),
+but a few (MIG, IP-10, IL-8) have some very high values that are literally
+"off the charts" (>25,000 pg/mL).
+
+---
+
+## 4. Missing data
+
+```{r missing}
+cat("No missing values in any table.\n")
+cat("sample_ids:  ", sum(complete.cases(sample_ids)), "/", nrow(sample_ids), "\n")
+cat("participants:", sum(complete.cases(participants)), "/", nrow(participants), "\n")
+cat("qpcr:        ", sum(complete.cases(qpcr)), "/", nrow(qpcr), "\n")
+cat("luminex:     ", sum(complete.cases(luminex)), "/", nrow(luminex), "\n")
+```
+
+There are **zero missing values** anywhere. The README hinted that
+`days_since_last_sex` might have NAs, but it doesn't. The data is clean.
+
+---
+
+## 5. Making a plot — and remaking it three times
+
+Let's zoom in on one question: **Does total bacterial load differ between
+the yogurt and unchanged diet groups after antibiotics?**
+
+I'll make this plot, get feedback, then improve it. The goal is not to
+create three different plots, but to **make the same plot three times**,
+each time learning something.
+
+### Attempt 1 — Raw plot, first draft
+
+```{r plot-v1}
+p1 <- qjoined |>
+  ggplot(aes(x = arm, y = qpcr_bacteria, fill = arm)) +
+  geom_boxplot() +
+  facet_wrap(~ time_point) +
+  labs(title = "Total bacterial load by group and time point",
+       subtitle = "Version 1 — raw scale",
+       y = "Total bacterial DNA copies", x = "") +
+  theme_minimal() +
+  theme(legend.position = "none")
+p1
+```
+
+**What I see:** The y-axis is dominated by a few extreme values. You can't
+see what's happening in the lower range at all. Most samples are squished
+at the bottom.
+
+### Attempt 2 — Log scale
+
+```{r plot-v2}
+p2 <- qjoined |>
+  ggplot(aes(x = arm, y = qpcr_bacteria, fill = arm)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  facet_wrap(~ time_point) +
+  scale_y_log10(labels = scales::comma) +
+  labs(title = "Total bacterial load by group and time point",
+       subtitle = "Version 2 — log10 scale with individual points",
+       y = "Total bacterial DNA copies (log scale)", x = "") +
+  theme_minimal() +
+  theme(legend.position = "none")
+p2
+```
+
+**What I see:** The log scale reveals structure that was invisible before.
+At baseline the groups look similar. After antibiotics, the yogurt group
+looks like it might have *lower* total bacteria overall — is that real?
+The jitter shows individual samples so we can see the spread.
+
+### Attempt 3 — Paired lines showing change within each person
+
+```{r plot-v3}
+# Reshape so we have one row per participant with baseline and after values
+paired_bacteria <- qjoined |>
+  select(pid, arm, time_point, qpcr_bacteria) |>
+  pivot_wider(names_from = time_point, values_from = qpcr_bacteria)
+
+p3 <- paired_bacteria |>
+  ggplot(aes(x = "baseline", y = baseline)) +
+  geom_point(aes(color = arm), size = 2.5, alpha = 0.7) +
+  geom_segment(aes(x = "baseline", xend = "after_antibiotic",
+                   y = baseline, yend = after_antibiotic,
+                   color = arm, group = pid),
+               alpha = 0.4) +
+  geom_point(aes(x = "after_antibiotic", y = after_antibiotic, color = arm),
+             size = 2.5, alpha = 0.7) +
+  scale_y_log10(labels = scales::comma) +
+  facet_wrap(~ arm) +
+  labs(title = "Total bacterial load: each participant's change",
+       subtitle = "Version 3 — paired lines, baseline → after antibiotic",
+       y = "Total bacterial DNA copies (log scale)", x = "") +
+  theme_minimal() +
+  theme(legend.position = "none")
+p3
+```
+
+**What I see:** This is the most informative version. Each line is one
+participant. In the yogurt group, most participants' bacterial load
+*decreases* from baseline to after antibiotics. In the unchanged diet
+group, the pattern is more mixed — about half go up, half go down.
+
+---
+
+## 6. What we learned
+
+### About the data
+
+- **No missing values** — the dataset is clean
+- **All numeric variables are right-skewed** — log transforms are essential
+- ***L. crispatus*** is undetected in 65% of samples but shows an interesting
+  recovery pattern after antibiotics in the yogurt group
+- **Some cytokines are unmeasurable** (IL-10, IFN-Y, TNFa) — they're below
+  detection limits in vaginal samples
+- **Extreme values exist** — 9 samples with total bacteria >29 million
+  need a closer look
+
+### Making one plot three times taught us
+
+1. **Raw scale**: useless when data spans 4+ orders of magnitude
+2. **Log scale + jitter**: reveals structure, shows individual points
+3. **Paired lines**: answers the real question — what happens *within* each
+  person from baseline to after treatment
+
+### Biological hunches for Thursday
+
+- Yogurt might help *L. crispatus* recover after antibiotics
+- Yogurt might reduce total bacterial load post-antibiotics
+- Depoprovera use is imbalanced between groups — could that matter?
+- Several cytokines are undetectable — is that biological or an assay problem?

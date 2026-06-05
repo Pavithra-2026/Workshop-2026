@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>dataset_exploration</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="dataset_exploration_files/libs/clipboard/clipboard.min.js"></script>
+<script src="dataset_exploration_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="dataset_exploration_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="dataset_exploration_files/libs/quarto-html/popper.min.js"></script>
+<script src="dataset_exploration_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="dataset_exploration_files/libs/quarto-html/anchor.min.js"></script>
+<link href="dataset_exploration_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="dataset_exploration_files/libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="dataset_exploration_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="dataset_exploration_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="dataset_exploration_files/libs/bootstrap/bootstrap-de9ea4695b5809f5b49b6072e50bb385.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<p>this — title: “Group 1 — Dataset Exploration” author: “Workshop Participant” format: html: toc: true code-fold: true embed-resources: true —</p>
+<p>This document explores all the CSV files found in the <code>data/</code> folder. There are four distinct datasets, each in its own subfolder. For every file we’ll describe what a single row represents and what each column means.</p>
+<hr>
+<section id="dataset-a-yogurt-study-datagroup_a_yogurt" class="level1">
+<h1>Dataset A — Yogurt Study (<code>data/group_a_yogurt/</code>)</h1>
+<p>A study looking at how eating yogurt affects the vaginal microbiome. Participants were assigned to either a <strong>yogurt</strong> group or an <strong>unchanged diet</strong> group, and samples were taken at <strong>baseline</strong> and <strong>after antibiotic</strong> treatment.</p>
+<section id="sample_ids_yogurt.csv" class="level2">
+<h2 class="anchored" data-anchor-id="sample_ids_yogurt.csv"><code>00_sample_ids_yogurt.csv</code></h2>
+<p><strong>What a row represents:</strong> one biological sample collected from one participant at one time point.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID (e.g.&nbsp;<code>pid_25</code>). Links to <code>01_participant_metadata_yogurt.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>time_point</code></td>
+<td>When the sample was taken: <code>baseline</code> or <code>after_antibiotic</code></td>
+</tr>
+<tr class="odd">
+<td><code>arm</code></td>
+<td>Study group assignment: <code>yogurt</code> or <code>unchanged_diet</code></td>
+</tr>
+<tr class="even">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier (e.g.&nbsp;<code>UNCH001</code>). Links to <code>02_qpcr_results_yogurt.csv</code> and <code>03_luminex_results_yogurt.csv</code></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>sample_ids <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_a_yogurt/00_sample_ids_yogurt.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 102 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (4): pid, time_point, arm, sample_id
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(sample_ids)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 102
+Columns: 4
+$ pid        &lt;chr&gt; "pid_25", "pid_51", "pid_33", "pid_13", "pid_37", "pid_09",…
+$ time_point &lt;chr&gt; "baseline", "baseline", "baseline", "baseline", "after_anti…
+$ arm        &lt;chr&gt; "unchanged_diet", "yogurt", "yogurt", "yogurt", "unchanged_…
+$ sample_id  &lt;chr&gt; "UNCH001", "YOG002", "YOG003", "YOG004", "UNCH005", "UNCH00…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="participant_metadata_yogurt.csv" class="level2">
+<h2 class="anchored" data-anchor-id="participant_metadata_yogurt.csv"><code>01_participant_metadata_yogurt.csv</code></h2>
+<p><strong>What a row represents:</strong> one study participant.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID. Links to <code>00_sample_ids_yogurt.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>arm</code></td>
+<td>Study group: <code>yogurt</code> or <code>unchanged_diet</code></td>
+</tr>
+<tr class="odd">
+<td><code>days_since_last_sex</code></td>
+<td>Number of days since the participant last had sex</td>
+</tr>
+<tr class="even">
+<td><code>birth_control</code></td>
+<td>Type of birth control used: <code>no hormonal birth control</code> or <code>Depoprovera</code></td>
+</tr>
+<tr class="odd">
+<td><code>age</code></td>
+<td>Age in years</td>
+</tr>
+<tr class="even">
+<td><code>education</code></td>
+<td>Education level: <code>less than grade 9</code>, <code>grade 10-12, matriculated</code>, <code>grade 10-12, not matriculated</code>, or <code>post-secondary</code></td>
+</tr>
+<tr class="odd">
+<td><code>sex</code></td>
+<td>Biological sex (all <code>female</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>participants_yogurt <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_a_yogurt/01_participant_metadata_yogurt.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 51 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (5): pid, arm, birth_control, education, sex
+dbl (2): days_since_last_sex, age
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(participants_yogurt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 51
+Columns: 7
+$ pid                 &lt;chr&gt; "pid_01", "pid_02", "pid_03", "pid_04", "pid_05", …
+$ arm                 &lt;chr&gt; "unchanged_diet", "unchanged_diet", "unchanged_die…
+$ days_since_last_sex &lt;dbl&gt; 2, 4, 3, 1, 5, 9, 3, 4, 10, 7, 9, 20, 1, 1, 11, 3,…
+$ birth_control       &lt;chr&gt; "no hormonal birth control", "Depoprovera", "no ho…
+$ age                 &lt;dbl&gt; 28, 34, 32, 30, 34, 27, 25, 26, 34, 32, 32, 32, 30…
+$ education           &lt;chr&gt; "grade 10-12, not matriculated", "less than grade …
+$ sex                 &lt;chr&gt; "female", "female", "female", "female", "female", …</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="qpcr_results_yogurt.csv" class="level2">
+<h2 class="anchored" data-anchor-id="qpcr_results_yogurt.csv"><code>02_qpcr_results_yogurt.csv</code></h2>
+<p><strong>What a row represents:</strong> one sample’s bacterial DNA measurements from qPCR (quantitative polymerase chain reaction — a lab technique that counts how many bacterial DNA copies are present).</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>00_sample_ids_yogurt.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>qpcr_bacteria</code></td>
+<td>Total bacterial load (number of DNA copies detected across all bacteria)</td>
+</tr>
+<tr class="odd">
+<td><code>qpcr_crispatus</code></td>
+<td>DNA copies of <em>Lactobacillus crispatus</em> — a “good” bacterium that keeps the vagina healthy</td>
+</tr>
+<tr class="even">
+<td><code>qpcr_iners</code></td>
+<td>DNA copies of <em>Lactobacillus iners</em> — another <em>Lactobacillus</em> species, often associated with a less stable microbiome</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>qpcr <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_a_yogurt/02_qpcr_results_yogurt.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 102 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): sample_id
+dbl (3): qpcr_bacteria, qpcr_crispatus, qpcr_iners
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(qpcr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 102
+Columns: 4
+$ sample_id      &lt;chr&gt; "UNCH092", "UNCH042", "UNCH015", "UNCH035", "UNCH019", …
+$ qpcr_bacteria  &lt;dbl&gt; 3093064.20, 8275.04, 7532202.40, 4794320.40, 5328343.60…
+$ qpcr_crispatus &lt;dbl&gt; 0.000, 0.000, 0.000, 12.994, 0.000, 0.000, 0.000, 38.58…
+$ qpcr_iners     &lt;dbl&gt; 26.840, 76.040, 554.964, 204308.968, 107806.148, 121045…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="luminex_results_yogurt.csv" class="level2">
+<h2 class="anchored" data-anchor-id="luminex_results_yogurt.csv"><code>03_luminex_results_yogurt.csv</code></h2>
+<p><strong>What a row represents:</strong> one cytokine measurement for one sample. Each sample has multiple rows (one per cytokine tested). Cytokines are signalling proteins the immune system uses to communicate — they tell us about inflammation levels.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>00_sample_ids_yogurt.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>cytokine</code></td>
+<td>Name of the cytokine measured: <code>IL-1a</code>, <code>IL-1b</code>, <code>IL-6</code>, <code>IL-8</code>, <code>IL-10</code>, <code>TNFa</code>, <code>IFN-Y</code>, <code>IP-10</code>, <code>MIG</code>, <code>MIP-3a</code></td>
+</tr>
+<tr class="odd">
+<td><code>conc</code></td>
+<td>Concentration of the cytokine (in pg/mL — picograms per millilitre)</td>
+</tr>
+<tr class="even">
+<td><code>limits</code></td>
+<td>Whether the value was <code>within limits</code> (reliable) or <code>out of range</code> (too low/high to measure accurately)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>luminex_yogurt <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_a_yogurt/03_luminex_results_yogurt.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1020 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): sample_id, cytokine, limits
+dbl (1): conc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(luminex_yogurt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,020
+Columns: 4
+$ sample_id &lt;chr&gt; "UNCH092", "UNCH092", "UNCH092", "UNCH092", "UNCH092", "UNCH…
+$ cytokine  &lt;chr&gt; "IL-1a", "IL-10", "IL-1b", "IL-8", "IL-6", "TNFa", "IP-10", …
+$ conc      &lt;dbl&gt; 5.8500, 0.7670, 0.2505, 7.9200, 0.0935, 0.4710, 177.3800, 36…
+$ limits    &lt;chr&gt; "within limits", "out of range", "out of range", "within lim…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="dataset-b-menstruation-study-datagroup_b_menstruation" class="level1">
+<h1>Dataset B — Menstruation Study (<code>data/group_b_menstruation/</code>)</h1>
+<p>A study of the vaginal microbiome throughout the menstrual cycle, comparing participants who use <strong>birth control</strong> vs <strong>no birth control</strong>. Samples were taken at four time points across the cycle.</p>
+<section id="sample_ids_period.csv" class="level2">
+<h2 class="anchored" data-anchor-id="sample_ids_period.csv"><code>00_sample_ids_period.csv</code></h2>
+<p><strong>What a row represents:</strong> one biological sample from one participant at one menstrual-cycle time point.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID. Links to <code>01_participant_metadata_period.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>time_point</code></td>
+<td>When in the cycle: <code>onset</code> (period starts), <code>end_bleeding</code>, <code>week_post</code>, or <code>week_prior</code></td>
+</tr>
+<tr class="odd">
+<td><code>arm</code></td>
+<td>Study group: <code>birth_control</code> or <code>no_birth_control</code></td>
+</tr>
+<tr class="even">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>02_luminex_period.csv</code> and <code>03_flow_cytometry_period.csv</code></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sample_ids_period <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_b_menstruation/00_sample_ids_period.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 108 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (4): pid, time_point, arm, sample_id
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(sample_ids_period)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 108
+Columns: 4
+$ pid        &lt;chr&gt; "pid_12", "pid_04", "pid_26", "pid_08", "pid_16", "pid_27",…
+$ time_point &lt;chr&gt; "week_post", "week_post", "onset", "end_bleeding", "week_po…
+$ arm        &lt;chr&gt; "birth_control", "birth_control", "birth_control", "no_birt…
+$ sample_id  &lt;chr&gt; "SAMP001", "SAMP002", "SAMP003", "SAMP004", "SAMP005", "SAM…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="participant_metadata_period.csv" class="level2">
+<h2 class="anchored" data-anchor-id="participant_metadata_period.csv"><code>01_participant_metadata_period.csv</code></h2>
+<p><strong>What a row represents:</strong> one study participant.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID</td>
+</tr>
+<tr class="even">
+<td><code>arm</code></td>
+<td>Study group: <code>birth_control</code> or <code>no_birth_control</code></td>
+</tr>
+<tr class="odd">
+<td><code>age</code></td>
+<td>Age in years</td>
+</tr>
+<tr class="even">
+<td><code>pcos_status</code></td>
+<td>Whether the participant has PCOS (polycystic ovary syndrome): <code>pcos</code> or <code>no disease</code></td>
+</tr>
+<tr class="odd">
+<td><code>period_product</code></td>
+<td>Menstrual product used: <code>tampon</code>, <code>pad</code>, or <code>menstrual_cup</code></td>
+</tr>
+<tr class="even">
+<td><code>sex</code></td>
+<td>Biological sex (all <code>female</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>participants_period <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_b_menstruation/01_participant_metadata_period.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 27 Columns: 6
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (5): pid, arm, pcos_status, period_product, sex
+dbl (1): age
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(participants_period)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 27
+Columns: 6
+$ pid            &lt;chr&gt; "pid_01", "pid_02", "pid_03", "pid_04", "pid_05", "pid_…
+$ arm            &lt;chr&gt; "birth_control", "birth_control", "no_birth_control", "…
+$ age            &lt;dbl&gt; 34, 30, 29, 31, 30, 41, 30, 30, 30, 27, 35, 30, 29, 30,…
+$ pcos_status    &lt;chr&gt; "no disease", "pcos", "pcos", "pcos", "pcos", "pcos", "…
+$ period_product &lt;chr&gt; "tampon", "menstrual_cup", "tampon", "pad", "tampon", "…
+$ sex            &lt;chr&gt; "female", "female", "female", "female", "female", "fema…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="luminex_period.csv" class="level2">
+<h2 class="anchored" data-anchor-id="luminex_period.csv"><code>02_luminex_period.csv</code></h2>
+<p><strong>What a row represents:</strong> one cytokine measurement for one sample (long format — each sample has multiple rows, one per cytokine tested).</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>00_sample_ids_period.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>cytokine</code></td>
+<td>Cytokine name: <code>IFNg</code>, <code>IL-1a</code>, <code>IL-1b</code>, <code>IL-6</code>, <code>IP-10</code>, <code>MIG</code>, <code>MIP-3a</code>, <code>TNFa</code></td>
+</tr>
+<tr class="odd">
+<td><code>conc</code></td>
+<td>Concentration in pg/mL</td>
+</tr>
+<tr class="even">
+<td><code>limits</code></td>
+<td>Measurement quality: <code>not_censored</code> (reliable), <code>below_detection_limit</code>, or <code>above_detect_limit</code></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>luminex_period <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_b_menstruation/02_luminex_period.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 864 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): sample_id, cytokine, limits
+dbl (1): conc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(luminex_period)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 864
+Columns: 4
+$ sample_id &lt;chr&gt; "SAMP048", "SAMP048", "SAMP048", "SAMP048", "SAMP048", "SAMP…
+$ cytokine  &lt;chr&gt; "IL-1a", "IL-1b", "IL-6", "TNFa", "MIG", "IFNg", "IP-10", "M…
+$ conc      &lt;dbl&gt; 0.75898551, 1.98212496, 0.09155273, 0.21362305, 180.45283113…
+$ limits    &lt;chr&gt; "not_censored", "not_censored", "below_detection_limit", "be…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="flow_cytometry_period.csv" class="level2">
+<h2 class="anchored" data-anchor-id="flow_cytometry_period.csv"><code>03_flow_cytometry_period.csv</code></h2>
+<p><strong>What a row represents:</strong> one sample’s immune cell counts from flow cytometry (a lab technique that counts and classifies cells using lasers).</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>00_sample_ids_period.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>live_cd19_negative</code></td>
+<td>Number of live cells that are not B-cells (CD19 is a B-cell marker)</td>
+</tr>
+<tr class="odd">
+<td><code>cd45_negative</code></td>
+<td>Cells that do not express CD45 — mostly non-immune cells</td>
+</tr>
+<tr class="even">
+<td><code>cd45_positive</code></td>
+<td>Cells that express CD45 — these are immune cells (white blood cells)</td>
+</tr>
+<tr class="odd">
+<td><code>neutrophils</code></td>
+<td>Number of neutrophils — a type of immune cell that fights bacteria</td>
+</tr>
+<tr class="even">
+<td><code>non_neutrophils</code></td>
+<td>Immune cells that are not neutrophils</td>
+</tr>
+<tr class="odd">
+<td><code>cd3_negative</code></td>
+<td>Immune cells that are not T-cells (CD3 is a T-cell marker)</td>
+</tr>
+<tr class="even">
+<td><code>cd3_positive</code></td>
+<td>T-cells (a key type of lymphocyte)</td>
+</tr>
+<tr class="odd">
+<td><code>cd4_t_cells</code></td>
+<td>Helper T-cells — they coordinate immune responses</td>
+</tr>
+<tr class="even">
+<td><code>cd8_t_cells</code></td>
+<td>Killer T-cells — they destroy infected cells</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>flow <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/group_b_menstruation/03_flow_cytometry_period.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 108 Columns: 10
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): sample_id
+dbl (9): live_cd19_negative, cd45_negative, cd45_positive, neutrophils, non_...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(flow)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 108
+Columns: 10
+$ sample_id          &lt;chr&gt; "SAMP048", "SAMP010", "SAMP097", "SAMP033", "SAMP03…
+$ live_cd19_negative &lt;dbl&gt; 445953, 333240, 169406, 669290, 194745, 171091, 194…
+$ cd45_negative      &lt;dbl&gt; 393595, 240537, 80198, 586660, 136587, 116438, 1365…
+$ cd45_positive      &lt;dbl&gt; 50445, 90305, 80880, 70474, 56149, 50330, 56149, 70…
+$ neutrophils        &lt;dbl&gt; 42589, 65707, 54903, 60023, 39461, 36794, 39461, 60…
+$ non_neutrophils    &lt;dbl&gt; 7856, 24596, 25973, 10450, 16688, 13535, 16688, 104…
+$ cd3_negative       &lt;dbl&gt; 2784, 14864, 13724, 7045, 5694, 8522, 5694, 7045, 5…
+$ cd3_positive       &lt;dbl&gt; 3734, 8853, 10665, 2470, 8971, 3806, 8971, 2470, 28…
+$ cd4_t_cells        &lt;dbl&gt; 1905, 4896, 5828, 1336, 4586, 2401, 4586, 1336, 114…
+$ cd8_t_cells        &lt;dbl&gt; 1390, 2951, 2759, 838, 2963, 1063, 2963, 838, 1105,…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="dataset-c-instructional-dataset-datainstructional_dataset" class="level1">
+<h1>Dataset C — Instructional Dataset (<code>data/instructional_dataset/</code>)</h1>
+<p>A teaching dataset from the UKZN workshop 2023 — a study where participants received either a <strong>treatment</strong> or a <strong>placebo</strong>, with samples collected at <strong>baseline</strong>, <strong>week 1</strong>, and <strong>week 7</strong>.</p>
+<section id="sample_ids_ukzn_workshop_2023.csv" class="level2">
+<h2 class="anchored" data-anchor-id="sample_ids_ukzn_workshop_2023.csv"><code>00_sample_ids_UKZN_workshop_2023.csv</code></h2>
+<p><strong>What a row represents:</strong> one biological sample from one participant at one study visit.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID. Links to <code>01_participant_metadata_UKZN_workshop_2023.csv</code> and <code>02_visit_clinical_measurements_UKZN_workshop_2023.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>time_point</code></td>
+<td>Study visit: <code>baseline</code>, <code>week_1</code>, or <code>week_7</code></td>
+</tr>
+<tr class="odd">
+<td><code>arm</code></td>
+<td>Study group: <code>treatment</code> or <code>placebo</code></td>
+</tr>
+<tr class="even">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>03_elisa_cytokines_UKZN_workshop_2023.csv</code> and <code>04_flow_cytometry_UKZN_workshop_2023.csv</code></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sample_ids_inst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/instructional_dataset/00_sample_ids_UKZN_workshop_2023.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 132 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (4): pid, time_point, arm, sample_id
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(sample_ids_inst)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 132
+Columns: 4
+$ pid        &lt;chr&gt; "pid_17", "pid_22", "pid_25", "pid_41", "pid_44", "pid_16",…
+$ time_point &lt;chr&gt; "baseline", "week_1", "week_1", "week_1", "week_7", "week_1…
+$ arm        &lt;chr&gt; "treatment", "treatment", "treatment", "treatment", "treatm…
+$ sample_id  &lt;chr&gt; "SAMP001", "SAMP002", "SAMP003", "SAMP004", "SAMP005", "SAM…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="participant_metadata_ukzn_workshop_2023.csv" class="level2">
+<h2 class="anchored" data-anchor-id="participant_metadata_ukzn_workshop_2023.csv"><code>01_participant_metadata_UKZN_workshop_2023.csv</code></h2>
+<p><strong>What a row represents:</strong> one study participant.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID</td>
+</tr>
+<tr class="even">
+<td><code>arm</code></td>
+<td>Study group: <code>treatment</code> or <code>placebo</code></td>
+</tr>
+<tr class="odd">
+<td><code>smoker</code></td>
+<td>Smoking status: <code>smoker</code> or <code>non-smoker</code></td>
+</tr>
+<tr class="even">
+<td><code>age</code></td>
+<td>Age in years</td>
+</tr>
+<tr class="odd">
+<td><code>education</code></td>
+<td>Education level: <code>less than grade 9</code>, <code>grade 10-12, matriculated</code>, <code>grade 10-12, not matriculated</code>, or <code>post-secondary</code></td>
+</tr>
+<tr class="even">
+<td><code>sex</code></td>
+<td>Biological sex (all <code>F</code> — female)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>participants_inst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/instructional_dataset/01_participant_metadata_UKZN_workshop_2023.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 44 Columns: 6
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (4): pid, arm, smoker, education
+dbl (1): age
+lgl (1): sex
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(participants_inst)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 44
+Columns: 6
+$ pid       &lt;chr&gt; "pid_01", "pid_02", "pid_03", "pid_04", "pid_05", "pid_06", …
+$ arm       &lt;chr&gt; "placebo", "placebo", "placebo", "placebo", "treatment", "pl…
+$ smoker    &lt;chr&gt; "non-smoker", "smoker", "smoker", "non-smoker", "non-smoker"…
+$ age       &lt;dbl&gt; 26, 33, 30, 34, 29, 34, 31, 30, 35, 32, 32, 31, 32, 32, 21, …
+$ education &lt;chr&gt; "grade 10-12, matriculated", "grade 10-12, matriculated", "p…
+$ sex       &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALS…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="visit_clinical_measurements_ukzn_workshop_2023.csv" class="level2">
+<h2 class="anchored" data-anchor-id="visit_clinical_measurements_ukzn_workshop_2023.csv"><code>02_visit_clinical_measurements_UKZN_workshop_2023.csv</code></h2>
+<p><strong>What a row represents:</strong> one participant’s clinical measurements at one study visit.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>pid</code></td>
+<td>Participant ID. Links to <code>00_sample_ids_UKZN_workshop_2023.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>time_point</code></td>
+<td>Study visit: <code>baseline</code>, <code>week_1</code>, or <code>week_7</code></td>
+</tr>
+<tr class="odd">
+<td><code>arm</code></td>
+<td>Study group: <code>treatment</code> or <code>placebo</code></td>
+</tr>
+<tr class="even">
+<td><code>nugent_score</code></td>
+<td>A score (0–10) of vaginal microbiome health — higher = more disturbed</td>
+</tr>
+<tr class="odd">
+<td><code>crp_blood</code></td>
+<td>C-reactive protein level in blood (mg/L) — a marker of inflammation</td>
+</tr>
+<tr class="even">
+<td><code>ph</code></td>
+<td>Vaginal pH — normally acidic (~4.5), higher pH can indicate infection</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>clinical <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/instructional_dataset/02_visit_clinical_measurements_UKZN_workshop_2023.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 132 Columns: 6
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): pid, time_point, arm
+dbl (3): nugent_score, crp_blood, ph
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(clinical)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 132
+Columns: 6
+$ pid          &lt;chr&gt; "pid_01", "pid_01", "pid_01", "pid_02", "pid_02", "pid_02…
+$ time_point   &lt;chr&gt; "baseline", "week_1", "week_7", "baseline", "week_1", "we…
+$ arm          &lt;chr&gt; "placebo", "placebo", "placebo", "placebo", "placebo", "p…
+$ nugent_score &lt;dbl&gt; 8, 7, 7, 7, 7, 4, 6, 10, 7, 5, 9, 7, 8, 3, 2, 10, 8, 8, 7…
+$ crp_blood    &lt;dbl&gt; 0.44, 1.66, 1.44, 1.55, 0.75, 1.17, 1.78, 0.57, 1.79, 1.7…
+$ ph           &lt;dbl&gt; 5.7, 5.2, 5.4, 5.2, 4.8, 4.2, 4.8, 5.3, 5.2, 4.8, 5.1, 5.…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="elisa_cytokines_ukzn_workshop_2023.csv" class="level2">
+<h2 class="anchored" data-anchor-id="elisa_cytokines_ukzn_workshop_2023.csv"><code>03_elisa_cytokines_UKZN_workshop_2023.csv</code></h2>
+<p><strong>What a row represents:</strong> one cytokine measurement for one sample (long format). ELISA is a lab technique that measures protein concentrations using antibodies.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>00_sample_ids_UKZN_workshop_2023.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>cytokine</code></td>
+<td>Cytokine name: <code>IL-1a</code>, <code>IL-1b</code>, <code>IL-6</code>, <code>IL-8</code>, <code>IL-10</code>, <code>TNFa</code>, <code>IFN-Y</code>, <code>IP-10</code>, <code>MIG</code>, <code>MIP-3a</code></td>
+</tr>
+<tr class="odd">
+<td><code>conc</code></td>
+<td>Concentration in pg/mL</td>
+</tr>
+<tr class="even">
+<td><code>limits</code></td>
+<td>Measurement quality: <code>within limits</code> or <code>out of range</code></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>elisa <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/instructional_dataset/03_elisa_cytokines_UKZN_workshop_2023.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 1320 Columns: 4
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (3): sample_id, cytokine, limits
+dbl (1): conc
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(elisa)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 1,320
+Columns: 4
+$ sample_id &lt;chr&gt; "SAMP094", "SAMP094", "SAMP094", "SAMP094", "SAMP094", "SAMP…
+$ cytokine  &lt;chr&gt; "IL-1a", "IL-10", "IL-1b", "IL-8", "IL-6", "TNFa", "IP-10", …
+$ conc      &lt;dbl&gt; 173.9000, 0.7670, 5.3900, 48.2900, 5.0700, 0.4710, 0.3050, 1…
+$ limits    &lt;chr&gt; "within limits", "out of range", "within limits", "within li…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+<section id="flow_cytometry_ukzn_workshop_2023.csv" class="level2">
+<h2 class="anchored" data-anchor-id="flow_cytometry_ukzn_workshop_2023.csv"><code>04_flow_cytometry_UKZN_workshop_2023.csv</code></h2>
+<p><strong>What a row represents:</strong> one sample’s immune cell counts from flow cytometry.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sample_id</code></td>
+<td>Unique sample identifier. Links to <code>00_sample_ids_UKZN_workshop_2023.csv</code></td>
+</tr>
+<tr class="even">
+<td><code>live_cd19_negative</code></td>
+<td>Number of live cells that are not B-cells</td>
+</tr>
+<tr class="odd">
+<td><code>cd45_negative</code></td>
+<td>Cells that are not immune cells (no CD45 marker)</td>
+</tr>
+<tr class="even">
+<td><code>cd45_positive</code></td>
+<td>Immune cells (express CD45)</td>
+</tr>
+<tr class="odd">
+<td><code>neutrophils</code></td>
+<td>Neutrophil count</td>
+</tr>
+<tr class="even">
+<td><code>non_neutrophils</code></td>
+<td>Immune cells that aren’t neutrophils</td>
+</tr>
+<tr class="odd">
+<td><code>cd3_negative</code></td>
+<td>Non-T-cell immune cells</td>
+</tr>
+<tr class="even">
+<td><code>cd3_positive</code></td>
+<td>T-cells</td>
+</tr>
+<tr class="odd">
+<td><code>cd4_t_cells</code></td>
+<td>Helper T-cells</td>
+</tr>
+<tr class="even">
+<td><code>cd8_t_cells</code></td>
+<td>Killer T-cells</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>flow_inst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/instructional_dataset/04_flow_cytometry_UKZN_workshop_2023.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 132 Columns: 10
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (1): sample_id
+dbl (9): live_cd19_negative, cd45_negative, cd45_positive, neutrophils, non_...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(flow_inst)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 132
+Columns: 10
+$ sample_id          &lt;chr&gt; "SAMP094", "SAMP052", "SAMP017", "SAMP046", "SAMP02…
+$ live_cd19_negative &lt;dbl&gt; 257321, 347091, 758678, 209217, 115716, 384029, 176…
+$ cd45_negative      &lt;dbl&gt; 251095, 259075, 537740, 160848, 27779, 356692, 8554…
+$ cd45_positive      &lt;dbl&gt; 4458, 86122, 208467, 46504, 83689, 26327, 86933, 36…
+$ neutrophils        &lt;dbl&gt; 863, 53132, 140369, 27435, 56681, 19601, 76364, 234…
+$ non_neutrophils    &lt;dbl&gt; 3593, 32988, 68094, 19069, 27007, 6726, 10569, 1275…
+$ cd3_negative       &lt;dbl&gt; 2421, 16341, 12292, 11719, 14236, 1897, 4402, 7071,…
+$ cd3_positive       &lt;dbl&gt; 988, 15078, 53758, 6254, 11355, 4076, 5647, 4655, 8…
+$ cd4_t_cells        &lt;dbl&gt; 409, 7126, 36212, 2872, 6384, 2405, 2942, 2523, 458…
+$ cd8_t_cells        &lt;dbl&gt; 444, 6009, 13434, 2629, 3039, 1310, 2165, 1563, 296…</code></pre>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="dataset-d-sorghum-timecourse-datamodeling01-sorghum_timecourse.csv" class="level1">
+<h1>Dataset D — Sorghum Timecourse (<code>data/modeling/01-sorghum_timecourse.csv</code>)</h1>
+<p>A plant biology dataset tracking <strong>gene expression</strong> in sorghum (a grain crop) across a growing season. Two genotypes (BT642 and RT430) were grown under different conditions (Control, Preflowering, Postflowering), and leaf samples were collected weekly from Day 14 to Day 98.</p>
+<p>The first nine columns are <strong>gene expression values</strong> — each is the expression level of one specific sorghum gene in that sample.</p>
+<section id="sorghum_timecourse.csv" class="level2">
+<h2 class="anchored" data-anchor-id="sorghum_timecourse.csv"><code>01-sorghum_timecourse.csv</code></h2>
+<p><strong>What a row represents:</strong> one leaf sample collected at one time point from one plant (or pool of plants), with expression measurements for nine genes.</p>
+<p><strong>Columns:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>Sobic.001G062300.v3.1</code> through <code>Sobic.003G421700.v3.1</code></td>
+<td>Expression level of each sorghum gene (9 genes total). These are Sorghum bicolor gene IDs from genome version 3.1</td>
+</tr>
+<tr class="even">
+<td><code>Barcode</code></td>
+<td>Sequencing barcode used to identify this sample in the lab</td>
+</tr>
+<tr class="odd">
+<td><code>libraryName</code></td>
+<td>Sequencing library name (e.g.&nbsp;<code>BOCAX</code>)</td>
+</tr>
+<tr class="even">
+<td><code>Block</code></td>
+<td>Field block number (e.g.&nbsp;<code>Block 05</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>Week</code></td>
+<td>Week of the study (3–14)</td>
+</tr>
+<tr class="even">
+<td><code>Replicate</code></td>
+<td>Biological replicate number (1–3)</td>
+</tr>
+<tr class="odd">
+<td><code>Genotype</code></td>
+<td>Sorghum variety: <code>BT642</code> or <code>RT430</code></td>
+</tr>
+<tr class="even">
+<td><code>Condition</code></td>
+<td>Growth condition: <code>Control</code>, <code>Preflowering</code>, or <code>Postflowering</code></td>
+</tr>
+<tr class="odd">
+<td><code>Sample.type</code></td>
+<td>Type of tissue sampled (all <code>Leaves</code>)</td>
+</tr>
+<tr class="even">
+<td><code>Day</code></td>
+<td>Day of the study (Day14 through Day98)</td>
+</tr>
+<tr class="odd">
+<td><code>Row</code></td>
+<td>Field row position</td>
+</tr>
+<tr class="even">
+<td><code>isFloweringWeek</code></td>
+<td>Whether this sample was collected during the week the plant flowered (<code>TRUE</code>/<code>FALSE</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>Date.Harvested</code></td>
+<td>Calendar date of harvest</td>
+</tr>
+<tr class="even">
+<td><code>Collection.Time</code></td>
+<td>Time of day collected</td>
+</tr>
+<tr class="odd">
+<td><code>No.plants.pooled</code></td>
+<td>Number of plants pooled into this sample</td>
+</tr>
+<tr class="even">
+<td><code>FloweringJulianDate</code></td>
+<td>Julian date (day of year) when the plant flowered</td>
+</tr>
+<tr class="odd">
+<td><code>FloweringDate</code></td>
+<td>Calendar date when the plant flowered</td>
+</tr>
+<tr class="even">
+<td><code>FloweringWeek</code></td>
+<td>Week number when flowering occurred</td>
+</tr>
+<tr class="odd">
+<td><code>FloweringDay</code></td>
+<td>Day of study when flowering occurred</td>
+</tr>
+<tr class="even">
+<td><code>Unreplicated</code></td>
+<td>Whether this sample had no replication (<code>TRUE</code>/<code>FALSE</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>CompleteSampleTreatment</code></td>
+<td>Composite label combining Genotype, Week, and Condition (e.g.&nbsp;<code>RT430:03:Preflowering</code>)</td>
+</tr>
+<tr class="even">
+<td><code>Timepoint</code></td>
+<td>Numeric week (same as <code>Week</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>Group</code></td>
+<td>Composite label combining Genotype and Condition (e.g.&nbsp;<code>RT430:Preflowering</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>sorghum <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../../data/modeling/01-sorghum_timecourse.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 160 Columns: 31
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (11): Barcode, libraryName, Block, Genotype, Condition, Sample.type, Da...
+dbl  (16): Sobic.001G062300.v3.1, Sobic.002G211000.v3.1, Sobic.002G278700.v3...
+lgl   (2): isFloweringWeek, Unreplicated
+date  (1): FloweringDate
+time  (1): Collection.Time
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(sorghum)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 160
+Columns: 31
+$ Sobic.001G062300.v3.1   &lt;dbl&gt; 6543, 6972, 5751, 10930, 5958, 5165, 15066, 48…
+$ Sobic.002G211000.v3.1   &lt;dbl&gt; 10563, 7907, 8500, 16516, 13175, 10777, 18230,…
+$ Sobic.002G278700.v3.1   &lt;dbl&gt; 37933, 46377, 41004, 38165, 38304, 42025, 2548…
+$ Sobic.008G179900.v3.1   &lt;dbl&gt; 13547, 12288, 12787, 15640, 15212, 13383, 1533…
+$ Sobic.010G177800.v3.1   &lt;dbl&gt; 666, 434, 564, 903, 723, 522, 1548, 784, 1892,…
+$ Sobic.001G291300.v3.1   &lt;dbl&gt; 3325, 2339, 1788, 3840, 2528, 1802, 3503, 2600…
+$ Sobic.004G030200.v3.1   &lt;dbl&gt; 8233, 3873, 6520, 5861, 5491, 3064, 12652, 756…
+$ Sobic.010G229450.v3.1   &lt;dbl&gt; 11894, 12256, 10683, 18837, 13735, 9898, 13789…
+$ Sobic.003G421700.v3.1   &lt;dbl&gt; 2669, 1750, 2477, 1874, 1600, 512, 4086, 463, …
+$ Barcode                 &lt;chr&gt; "0622162L05", "0622162L13", "0622162L18", "062…
+$ libraryName             &lt;chr&gt; "BOCAX", "BOCGY", "BOPGU", "BOCBN", "BOCHO", "…
+$ Block                   &lt;chr&gt; "Block 05", "Block 13", "Block 18", "Block 05"…
+$ Week                    &lt;dbl&gt; 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 7, 8, 8, 8, 9…
+$ Replicate               &lt;dbl&gt; 3, 2, 1, 3, 2, 1, 2, 3, 3, 2, 1, 3, 2, 3, 1, 2…
+$ Genotype                &lt;chr&gt; "RT430", "RT430", "RT430", "RT430", "RT430", "…
+$ Condition               &lt;chr&gt; "Preflowering", "Preflowering", "Preflowering"…
+$ Sample.type             &lt;chr&gt; "Leaves", "Leaves", "Leaves", "Leaves", "Leave…
+$ Day                     &lt;chr&gt; "Day21", "Day21", "Day21", "Day28", "Day28", "…
+$ Row                     &lt;chr&gt; "Row2", "Row2", "Row2", "Row4", "Row4", "Row4"…
+$ isFloweringWeek         &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALS…
+$ Date.Harvested          &lt;chr&gt; "6/22/16", "6/22/16", "6/22/16", "6/29/16", "6…
+$ Collection.Time         &lt;time&gt; 11:15:00, 12:35:00, 11:30:00, 10:32:00, 11:23…
+$ No.plants.pooled        &lt;dbl&gt; 15, 15, 15, 15, 10, 15, 10, 10, 10, 10, 10, 10…
+$ FloweringJulianDate     &lt;dbl&gt; 230, 228, 228, 230, 228, 228, 228, 230, 230, 2…
+$ FloweringDate           &lt;date&gt; 2016-08-17, 2016-08-15, 2016-08-15, 2016-08-1…
+$ FloweringWeek           &lt;dbl&gt; 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11…
+$ FloweringDay            &lt;dbl&gt; 82, 80, 80, 82, 80, 80, 80, 82, 82, 80, 80, 82…
+$ Unreplicated            &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALS…
+$ CompleteSampleTreatment &lt;chr&gt; "RT430:03:Preflowering", "RT430:03:Preflowerin…
+$ Timepoint               &lt;dbl&gt; 3, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6, 7, 8, 8, 8, 9…
+$ Group                   &lt;chr&gt; "RT430:Preflowering", "RT430:Preflowering", "R…</code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
